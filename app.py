@@ -6,11 +6,10 @@ app = Flask(__name__)
 app.secret_key = "secret"
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///users.db"
 app.config["SESSION_COOKIE_HTTPONLY"] = True
-app.config["SESSION_COOKIE_SECURE"] = False  # set True if using HTTPS
-app.config["PERMANENT_SESSION_LIFETIME"] = 1800  # 30 minutes
+app.config["SESSION_COOKIE_SECURE"] = False  
+app.config["PERMANENT_SESSION_LIFETIME"] = 1800 
 db = SQLAlchemy(app)
 
-# ------------------ Database Models ------------------
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), unique=True, nullable=False)
@@ -25,7 +24,7 @@ class Donor(db.Model):
     city = db.Column(db.String(50), nullable=False)
     username = db.Column(db.String(100), nullable=False)
 
-# ------------------ CSS ------------------
+
 css = """
 <style>
 body {
@@ -132,7 +131,6 @@ body {
 </style>
 """
 
-# ------------------ Navbar Template ------------------
 navbar = """
 <div class="navbar">
   <div class="logo" onclick="window.location.href='/'">
@@ -152,7 +150,6 @@ navbar = """
 </div>
 """
 
-# ------------------ Home ------------------
 @app.route("/")
 def home():
     return render_template_string(css + navbar + """
@@ -162,7 +159,7 @@ def home():
     </div>
     """)
 
-# ------------------ Signup ------------------
+
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
     if request.method == "POST":
@@ -198,7 +195,7 @@ def signup():
     </div>
     """)
 
-# ------------------ Login ------------------
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
@@ -228,21 +225,21 @@ def login():
     </div>
     """)
 
-# ------------------ Dashboard ------------------
+
 @app.route("/dashboard")
 def dashboard():
     if "username" not in session:
         return redirect("/login")
     return render_template_string(css + navbar + """
     <div class="dashboard">
-      <h2>Welcome, {{session['username']}} 👋</h2>
+      <h2>Welcome, {{session['username']}} </h2>
       <button onclick="window.location.href='/donor'">Register as Donor</button>
       <button onclick="window.location.href='/donors'">View Donors</button>
       <button onclick="window.location.href='/profile'">My Profile</button>
     </div>
     """)
 
-# ------------------ Donor Registration ------------------
+
 @app.route("/donor", methods=["GET", "POST"])
 def donor():
     if "username" not in session:
@@ -285,7 +282,6 @@ def donor():
     </div>
     """)
 
-# ------------------ Profile (View & Edit) ------------------
 @app.route("/profile", methods=["GET", "POST"])
 def profile():
     if "username" not in session:
@@ -334,7 +330,7 @@ def profile():
     </div>
     """, donor=donor)
 
-# ------------------ View Donors ------------------
+
 @app.route("/donors", methods=["GET", "POST"])
 def donors():
     if "username" not in session:
@@ -376,7 +372,6 @@ def donors():
     </div>
     """)
 
-# ------------------ Contact ------------------
 @app.route("/contact")
 def contact():
     return render_template_string(css + navbar + """
@@ -387,15 +382,15 @@ def contact():
     </div>
     """)
 
-# ------------------ Logout ------------------
 @app.route("/logout")
 def logout():
     session.pop("username", None)
     flash("You have been logged out.", "success")
     return redirect("/")
 
-# ------------------ Run App ------------------
+
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
+
     app.run(debug=True)
